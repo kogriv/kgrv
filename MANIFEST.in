@@ -3,8 +3,8 @@
 include README.md
 include LICENSE
 include requirements.txt
-include requirements-dev.txt
 include pyproject.toml
+include CHANGELOG.md
 
 # Документация
 recursive-include docs *.md *.txt
@@ -13,7 +13,11 @@ recursive-include docs *.md *.txt
 recursive-exclude tests *
 recursive-exclude scripts *
 recursive-exclude .git *
+recursive-exclude htmlcov *
+recursive-exclude __pycache__ *
+recursive-exclude *.egg-info *
 exclude .gitignore
+exclude .coverage
 exclude *.pyc
 exclude *.pyo
 exclude *~

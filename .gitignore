@@ -106,7 +106,7 @@ celerybeat.pid
 .venv
 env/
 venv/
-venv_kogrv_dell/
+venv_*/
 ENV/
 env.bak/
 venv.bak/
@@ -138,3 +138,13 @@ dmypy.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

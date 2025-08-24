@@ -91,7 +91,6 @@ setup(
     entry_points={
         "console_scripts": [
             "kgrv=kgrv.cli_click:cli",
-            "kgrv-info=kgrv.about:About.print_info",
         ],
     },
 )
