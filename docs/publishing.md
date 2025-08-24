@@ -281,8 +281,27 @@ twine check dist/*
 
 ### 3. Настройка аутентификации
 
-Создайте файл `~/.pypirc`:
+#### Создание файла `~/.pypirc`
 
+**Важно:** Файл `~/.pypirc` создается в **домашней папке пользователя**, а не в папке проекта!
+
+**Расположение файла:**
+- **Windows:** `C:\Users\ИмяПользователя\.pypirc`
+- **Linux/Mac:** `/home/username/.pypirc`
+
+**Создание файла в Windows PowerShell:**
+```powershell
+# Перейти в домашнюю папку
+cd ~
+
+# Создать файл
+New-Item -Path ".pypirc" -ItemType File
+
+# Или через блокнот
+notepad .pypirc
+```
+
+**Содержимое файла `~/.pypirc`:**
 ```ini
 [distutils]
 index-servers =
@@ -300,6 +319,17 @@ username = __token__
 password = pypi-ваш-токен-pypi
 ```
 
+**Как twine находит этот файл:**
+1. Переменная окружения: `TWINE_CONFIG_FILE`
+2. Домашняя папка: `~/.pypirc` (по умолчанию)
+3. Текущая папка: `./.pypirc`
+
+**Безопасность токенов:**
+- ✅ Храните токены в `~/.pypirc` (не в проекте)
+- ✅ Не коммитьте токены в Git
+- ✅ Используйте `__token__` как username
+- ✅ Токен начинается с `pypi-`
+
 ### 4. Загрузка на Test PyPI
 
 ```bash
@@ -308,17 +338,62 @@ twine upload --repository testpypi dist/*
 
 ### 5. Проверка установки с Test PyPI
 
-```bash
-# Создайте новое виртуальное окружение
+**⚠️ Важно:** Test PyPI не содержит все пакеты из основного PyPI! Для установки зависимостей нужно использовать оба репозитория.
+
+#### Создание тестового окружения
+
+```powershell
+# Создать новое ВО в папке проекта (рекомендуется)
+python -m venv venv_test
+venv_test\Scripts\Activate.ps1
+
+# Или создать в отдельной папке
+mkdir test_install
+cd test_install
 python -m venv test_env
-test_env\Scripts\activate  # Windows
+test_env\Scripts\Activate.ps1
+```
 
-# Установите из Test PyPI
-pip install --index-url https://test.pypi.org/simple/ your-package-name
+#### Установка пакета из Test PyPI
 
-# Тестируйте функционал
-python -c "import your_package; print(your_package.__version__)"
-your-command --help
+**Правильная установка с зависимостями:**
+```powershell
+# Установить пакет из Test PyPI, но зависимости из основного PyPI
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kgrv
+```
+
+**Что происходит:**
+- `--index-url https://test.pypi.org/simple/` - ищет ваш пакет в Test PyPI
+- `--extra-index-url https://pypi.org/simple/` - ищет зависимости в основном PyPI
+
+#### Тестирование установки
+
+```powershell
+# Проверить установленные пакеты
+pip list
+
+# Проверить CLI команду
+kgrv --help
+
+# Запустить функционал
+kgrv about
+
+# Проверить импорт
+python -c "import kgrv; print(f'Версия: {kgrv.__version__}')"
+```
+
+#### Ожидаемый результат
+
+```
+Collecting kgrv
+  Downloading https://test-files.pythonhosted.org/packages/.../kgrv-0.1.0-py3-none-any.whl
+Collecting click>=8.0.0 (from kgrv)
+  Downloading https://files.pythonhosted.org/packages/.../click-8.1.7-py3-none-any.whl
+Collecting colorama>=0.4.0 (from kgrv)
+  Downloading https://files.pythonhosted.org/packages/.../colorama-0.4.6-py2.py3-none-any.whl
+Collecting requests>=2.25.0 (from kgrv)
+  Downloading https://files.pythonhosted.org/packages/.../requests-2.31.0-py3-none-any.whl
+Successfully installed kgrv-0.1.0 click-8.1.7 colorama-0.4.6 requests-2.31.0 ...
 ```
 
 ## 🚀 Публикация на PyPI
@@ -485,6 +560,30 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "my-package"
 ```
+
+### 7. Проблемы с установкой из Test PyPI
+```bash
+# ❌ Неправильная установка
+pip install --index-url https://test.pypi.org/simple/ kgrv
+# Ошибка: No matching distribution found for requests>=2.25.0
+
+# ✅ Правильная установка с зависимостями
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kgrv
+```
+
+**Причина:** Test PyPI не содержит все пакеты из основного PyPI, только ваши тестовые пакеты.
+
+### 8. Неправильное расположение .pypirc
+```bash
+# ❌ Создание в папке проекта
+touch .pypirc  # Неправильно!
+
+# ✅ Создание в домашней папке
+cd ~
+touch .pypirc  # Правильно!
+```
+
+**Причина:** twine ищет .pypirc в домашней папке по умолчанию.
 
 ## 🔄 Обновление пакета
 
