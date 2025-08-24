@@ -30,7 +30,11 @@ classifiers = [
     "Topic :: Utilities",
 ]
 requires-python = ">=3.7"
-dependencies = []
+dependencies = [
+    "click>=8.0.0",
+    "colorama>=0.4.0",
+    "requests>=2.25.0",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -55,8 +59,7 @@ Documentation = "https://github.com/kogriv/kgrv/tree/master/docs"
 "Bug Reports" = "https://github.com/kogriv/kgrv/issues"
 
 [project.scripts]
-kgrv-demo = "scripts.demo:main"
-kgrv-cli = "scripts.cli:main"
+kgrv = "kgrv.cli_click:cli"
 
 [tool.setuptools]
 packages = ["kgrv"]
